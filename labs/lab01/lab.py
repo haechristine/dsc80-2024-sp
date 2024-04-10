@@ -57,11 +57,6 @@ def n_prefixes(s, n):
 
 
 def exploded_numbers(ints, n):
-    # list = []
-    # for j in range(len(ints)):
-    #     for k in range(n):
-    #         list += ints[j] - n
-    #         j+1
     list = []
     length = len(str(ints[-1] + n))
     min_num = ints[0] - n
@@ -81,7 +76,12 @@ def exploded_numbers(ints, n):
 
 
 def last_chars(fh):
-    ...
+    string = ""
+    for line in fh:
+        line = line.strip()
+        if line:
+            string += line[-1]
+    return string
 
 
 # ---------------------------------------------------------------------
@@ -90,10 +90,15 @@ def last_chars(fh):
 
 
 def add_root(A):
-    ...
+    index_sqrt = np.sqrt(np.arange(len(A)))
+    sum = A + index_sqrt
+    return sum
 
 def where_square(A):
-    ...
+    sqrt = np.sqrt(A)
+    perf_square = np.equal(sqrt.astype(int), sqrt)
+    return perf_square
+
 
 
 # ---------------------------------------------------------------------
@@ -102,8 +107,13 @@ def where_square(A):
 
 
 def filter_cutoff_loop(matrix, cutoff):
-    ...
-
+    mean_array = [sum(col) / len(col) for col in matrix.T]
+    final_cols = []
+    for i, mean in enumerate(mean_array):
+        if mean > cutoff:
+            final_cols.append(i)
+    filter_matrix = matrix[:, final_cols]
+    return filter_matrix 
 
 # ---------------------------------------------------------------------
 # QUESTION 6
