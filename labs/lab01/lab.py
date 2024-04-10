@@ -121,7 +121,10 @@ def filter_cutoff_loop(matrix, cutoff):
 
 
 def filter_cutoff_np(matrix, cutoff):
-    ...
+    mean_array = matrix.mean(axis=0) 
+    compare = mean_array > cutoff    
+    filter_matrix = matrix[:, compare]
+    return filter_matrix
 
 
 # ---------------------------------------------------------------------
@@ -130,7 +133,7 @@ def filter_cutoff_np(matrix, cutoff):
 
 
 def growth_rates(A):
-    ...
+    index_array = np.arange(len(A))
 
 def with_leftover(A):
     ...
