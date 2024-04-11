@@ -133,11 +133,26 @@ def filter_cutoff_np(matrix, cutoff):
 
 
 def growth_rates(A):
-    index_array = np.arange(len(A))
+    diff = np.diff(A)
+    rate = diff/A[:-1]
+    rate_rounded = np.round(rate, 2)
+    return rate_rounded
 
 def with_leftover(A):
-    ...
+    initial = 20
+    # num of shares bought each day 
+    stocks_bought = np.floor(initial/A)
+    # remaining money after day's purchase
+    initial = initial - stocks_bought*A
+    #remaining money using cum sum
+    leftover = np.cumsum(initial)
+    # find when leftover money can buy at least one full share
+    day = np.argmax(leftover >= A)
+    if leftover[day] < A[day]:
+        return -1
+    return day 
 
+    
 
 # ---------------------------------------------------------------------
 # QUESTION 8
@@ -145,8 +160,33 @@ def with_leftover(A):
 
 
 def salary_stats(salary):
-    ...
+    num_players = salary.shape[0]
+    num_teams = salary['Team'].nunique()
+    total_salary = salary['Salary'].sum()
+    highest_salary = salary.loc[salary['Salary'].idxmax()]['Player']
+    avg_los = salary.loc[salary['Team'] == 'Los Angeles Lakers', 'Salary'].mean()
 
+    fifth = salary.sort_values('Salary').iloc[4]
+    fifth_lowest = f"{fifth['Player']}, {fifth['Team']}"
+
+    salary['Last Name'] = salary['Player'].apply(lambda x: x.split()[0])
+    dupes = salary['Last Name'].duplicated().any()
+
+    team_high = salary.loc[salary['Salary'].idxmax()]['Team']
+    total_highest = salary.loc[salary['Team'] == team_high, 'Salary'].sum()
+
+    stats = pd.Series({
+        'num_players': num_players,
+        'num_teams': num_teams,
+        'total_salary': total_salary,
+        'highest_salary': highest_salary,
+        'avg_los': round(avg_los, 2),
+        'fifth_lowest': fifth_lowest,
+        'duplicates': dupes,
+        'total_highest': total_highest
+    })
+    
+    return stats
 
 # ---------------------------------------------------------------------
 # QUESTION 9
@@ -154,4 +194,4 @@ def salary_stats(salary):
 
 
 def parse_malformed(fp):
-    ...
+    return -1
