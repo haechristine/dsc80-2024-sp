@@ -194,4 +194,40 @@ def salary_stats(salary):
 
 
 def parse_malformed(fp):
-    return -1
+    parsed_data = []
+    with open(fp, 'r') as file:
+        for line in file:
+            data = []
+
+            # Iterate through each character in the line
+            dupCommaIndex = None
+            lastCommaIndex = None
+            for i in range(len(line)):
+                if lastCommaIndex == None or i == lastCommaIndex + 1:
+                    dupCommaIndex = i
+                lastCommaIndex = i
+                
+            newLine = ""
+            if dupCommaIndex != None:
+                newLine = line[:dupCommaIndex] + line[dupCommaIndex + 1:]
+                
+            data = newLine.split(',')
+            data = [value for value in data if value != '']
+            if data[0] == 'first':
+                continue
+            first_name = data[0].replace('"', '')
+            last_name = data[1].replace('"', '')
+            weight = float(data[2].replace('"', ''))
+            height = float(data[3].replace('"', ''))
+            geo = data[4]+ ',' + data[5] 
+            geo = geo.replace('"', '')
+            
+            # Append the cleaned fields to the parsed data
+            parsed_data.append([first_name, last_name, weight, height, geo])
+
+    # Create DataFrame with the parsed data
+    df = pd.DataFrame(parsed_data)
+    df.columns = parsed_data[0]
+    df.columns = ['first', 'last', 'weight', 'height', 'geo']
+
+    return df
