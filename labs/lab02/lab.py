@@ -93,7 +93,7 @@ def super_hero_powers(powers):
     
     hero_list.append(flying_count.index[0])
     
-    one_power = powers[df.iloc[:, 0] == 1]
+    one_power = powers[powers.iloc[:, 0] == 1]
     one_power_count = one_power[power_cols].sum()
     one_power_max = one_power_count.idxmax()
 
