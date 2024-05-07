@@ -191,4 +191,4 @@ def same_color_distribution():
 
 
 def perm_vs_hyp():
-        return ['H', 'H', 'P', 'H','P']
+        return ['H', 'P', 'P', 'H', 'P']
