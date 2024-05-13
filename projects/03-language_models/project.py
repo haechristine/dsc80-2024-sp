@@ -15,7 +15,27 @@ import time
 
 
 def get_book(url):
-    ...
+    robots_url = "https://www.gutenberg.org/robots.txt"
+    robots_resp = requests.get(robots_url)
+    robots_content = robots_resp.text
+    match = re.search(r"Crawl-delay: (\d+\.?\d*)", robots_content)
+    pause_length = float(match.group(1)) if match else 0.5
+
+    response = requests.get(url)
+    content = response.text
+
+ 
+    start = r"\*\*\* START OF THE PROJECT GUTENBERG EBOOK .*? \*\*\*"
+    end = r"\*\*\* END OF THE PROJECT GUTENBERG EBOOK .*? \*\*\*"
+    start_match = re.search(start, content, re.DOTALL)
+    end_match = re.search(end, content, re.DOTALL)
+    book = content[start_match.end():end_match.start()]
+
+    book = book.replace('\r\n', '\n')
+
+    time.sleep(pause_length)
+
+    return book
 
 
 # ---------------------------------------------------------------------
@@ -24,7 +44,22 @@ def get_book(url):
 
 
 def tokenize(book_string):
-    ...
+    book_string = re.sub(r'\n{2,}', '\x03\x02', book_string)
+    
+    tokens = ['\x02']
+    
+    pattern = r"[\w']+|[\.,!?;:()]|[\x03\x02]"
+
+    tokens.extend(re.findall(pattern, book_string))
+
+    tokens.append('\x03')
+    if (tokens[1] == '\x03'):
+        tokens = tokens[:1] + tokens[3:]
+    if (tokens[-3] == '\x03'):
+        second_last = len(tokens) - 2
+        third_last = len(tokens) - 3
+        tokens = tokens[:third_last] + tokens[second_last + 1:]
+    return tokens
 
 
 # ---------------------------------------------------------------------
