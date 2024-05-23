@@ -79,26 +79,13 @@ def most_common(df, N=10):
 
 
 def super_hero_powers(powers):
-    hero_list = []
-    
-    power_cols = powers.select_dtypes(include= bool).columns
-    power_count = (powers[power_cols].sum()).sort_values(ascending=False)
-    max_powers = power_count.idxmax()
-    
-    hero_list.append(max_powers)
+    max_power = powers[powers.sum(axis=1, numeric_only=True) == powers.sum(axis=1, numeric_only=True).max()].iloc[0]['hero_names']
 
-    # df consisting of flight being superpower
-    flying = powers[(powers['Flight'] == 1)]
-    flying_count = flying[power_cols].sum()
-    
-    hero_list.append(flying_count.index[0])
-    
-    one_power = powers[powers.iloc[:, 0] == 1]
-    one_power_count = one_power[power_cols].sum()
-    one_power_max = one_power_count.idxmax()
+    flying = powers[powers['Flight'] == True].sum().drop('hero_names').sort_values(ascending = False).index[1]
 
-    hero_list.append(one_power_max)
-    return hero_list
+    common_one = powers[powers.sum(axis=1, numeric_only=True) == 1].sum(axis = 0).drop('hero_names').sort_values(ascending = False).index[0]
+
+    return [max_power, flying, common_one]
 
 
 # ---------------------------------------------------------------------
