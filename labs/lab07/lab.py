@@ -268,7 +268,6 @@ def extract_personal(s):
 # QUESTION 3
 # ---------------------------------------------------------------------
 
-
 def tfidf_data(reviews_ser, review):
     words = review.replace('  ', ' ').split(' ')
     review_len = len(words)
@@ -295,7 +294,8 @@ def tfidf_data(reviews_ser, review):
 
     return pd.DataFrame({'cnt':cnt, 'tf':tf, 'idf':idf, 'tfidf':tfidf})
 
-def relevant_word(out):
+
+def relevant_word(tfidf_df):
     best = tfidf_df['tfidf'].idxmax()
     return best
 
