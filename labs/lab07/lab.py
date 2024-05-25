@@ -270,11 +270,35 @@ def extract_personal(s):
 
 
 def tfidf_data(reviews_ser, review):
-    ...
+    words = review.replace('  ', ' ').split(' ')
+    review_len = len(words)
+
+    ser_len = len(reviews_ser)
+
+    cnt = {}
+    tf = {}
+    idf = {}
+    tfidf = {}
+
+    for word in words:
+        count = words.count(word)
+        cnt[word] = count
+
+        freq = count/review_len
+        tf[word] = freq
+
+        word_appears = sum(1 for review in reviews_ser if re.search(r'\b' + word + r'\b', review))
+        inverse = np.log(ser_len / word_appears)
+        idf[word] = inverse
+
+        tfidf[word] = freq * inverse
+
+    return pd.DataFrame({'cnt':cnt, 'tf':tf, 'idf':idf, 'tfidf':tfidf})
 
 
 def relevant_word(out):
-    ...
+    best = tfidf_df['tfidf'].idxmax()
+    return best
 
 
 # ---------------------------------------------------------------------
@@ -283,17 +307,114 @@ def relevant_word(out):
 
 
 def hashtag_list(tweet_text):
-    ...
+    total_hash = []
+    for tweet in tweet_text:
+        hashtag = re.findall(r'#[^\s]*', tweet)
+        hashtag = list(map(lambda x: x[1:], hashtag))
+        total_hash.append(hashtag)
+    return pd.Series(total_hash)
 
 
 def most_common_hashtag(tweet_lists):
-    ...
+    count = {}
+    for tags in tweet_lists:
+        for tag in tags:
+            if tag not in count:
+                count[tag] = 1
+            else:
+                count[tag] += 1
+
+    hash_list = []
+    for tags in tweet_lists:
+        if len(tags) == 0:
+            hash_list.append(np.nan)
+        elif len(tags) == 1:
+            hash_list.append(tags[0])
+        else:
+            common = ''
+            for i in range(len(tags) - 1):
+                if count[tags[i]] <= count[tags[i+1]]:
+                    common=tags[i+1]
+                else:
+                    common=tags[i]
+            hash_list.append(common)
+
+    return pd.Series(hash_list)
 
 
 # ---------------------------------------------------------------------
 # QUESTION 5
 # ---------------------------------------------------------------------
 
+def tag_helper(tweet):
+    total = []
+    for text in tweet:
+        tag = re.findall(r'@[\w]+', text)
+        tag = list(map(lambda x: x[1:], tag))
+        total.append(tag)
+    return pd.Series(total).apply(lambda x: len(x))
+
+def link_helper(tweet):
+    total = []
+    for text in tweet:
+        link = re.findall(r'https*:\/\/[^\s]*', text)
+        link = list(map(lambda x: x[1:], link))
+        total.append(link)
+    return pd.Series(total).apply(lambda x: len(x))
+
+def clean_helper(tweet):
+    cleaned = []
+    for text in tweet:
+        text = re.sub(r'RT', ' ', text)
+        text = re.sub(r'@[\w]+', ' ', text)
+        text = re.sub(r'https*:\/\/[^\s]*', ' ', text)
+        text = re.sub(r'#[^\s]*', ' ', text)
+        text = re.sub(r'[^A-Za-z\d\s]+', ' ', text)
+        text = text.lower()
+        text = re.sub(r'\s+', ' ', text).strip()
+        cleaned.append(text)
+    return pd.Series(cleaned)
 
 def create_features(ira):
-    ...
+    df = ira.index
+    
+    num_hashtags = {}
+    mc_hashtags = {}
+    num_tags = {}
+    num_links = {}
+    is_retweet = {}
+    text = {}
+
+    texts = ira['text']
+    hashtags = hashtag_list(texts)
+
+    common_hashtags = most_common_hashtag(hashtags)
+
+    tags_counts = tag_helper(texts)
+
+    link_counts = link_helper(texts)
+
+    cleaned_texts = clean_helper(texts)
+    
+    for i in df:
+        hashtag_len = len(hashtags.iloc[i])
+        num_hashtags[i] = hashtag_len
+        
+        mc_hashtags[i] = common_hashtags.iloc[i]
+
+        num_tags[i] = tags_counts.iloc[i]
+
+        num_links[i] = link_counts.iloc[i]
+
+        is_retweet[i] = texts.iloc[i][:2] == 'RT'
+
+        text[i] = cleaned_texts.iloc[i]
+        
+    return pd.DataFrame({
+        'text': text,
+        'num_hashtags': num_hashtags,
+        'mc_hashtags': mc_hashtags,
+        'num_tags': num_tags,
+        'num_links': num_links,
+        'is_retweet':is_retweet
+    })
