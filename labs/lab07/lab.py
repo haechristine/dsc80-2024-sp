@@ -295,7 +295,6 @@ def tfidf_data(reviews_ser, review):
 
     return pd.DataFrame({'cnt':cnt, 'tf':tf, 'idf':idf, 'tfidf':tfidf})
 
-
 def relevant_word(out):
     best = tfidf_df['tfidf'].idxmax()
     return best
