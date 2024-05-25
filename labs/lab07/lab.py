@@ -30,7 +30,7 @@ def match_1(string):
     >>> match_1("1b[#d] _")
     True
     """
-    pattern = ...
+    pattern = r'^..[\[]..[\]].*$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -57,7 +57,7 @@ def match_2(string):
     >>> match_2("(858) 456-7890b")
     False
     """
-    pattern = ...
+    pattern = r'^\(858\) \d{3}-\d{4}$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -84,7 +84,7 @@ def match_3(string):
     >>> match_3(" adf!qe? ")
     False
     """
-    pattern = ...
+    pattern = r'^[a-zA-Z0-9\s?]{5,9}\?$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -113,7 +113,7 @@ def match_4(string):
     >>> match_4("$!@$")
     False
     """
-    pattern = ...
+    pattern = r'^\$[^abc$]*\$[Aa]+[Bb]+[Cc]+$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -132,7 +132,7 @@ def match_5(string):
     >>> match_5("dsc80+.py")
     False
     """
-    pattern = ...
+    pattern = r'^[a-zA-Z0-9_]+\.py$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -153,7 +153,7 @@ def match_6(string):
     >>> match_6("ABCDEF_ABCD")
     False
     """
-    pattern = ...
+    pattern = r'^[a-z]+_[a-z]+$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -172,7 +172,7 @@ def match_7(string):
     >>> match_7("_ncde")
     False
     """
-    pattern = ...
+    pattern = r'^_.*_$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -194,7 +194,7 @@ def match_8(string):
     >>> match_8("ASDJKL9380JKAL")
     True
     """
-    pattern = ...
+    pattern = r'^[^Oi1]*$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -218,7 +218,7 @@ def match_9(string):
     >>> match_9('TX-32-SAN-4491')
     False
     '''
-    pattern = ...
+    pattern = r'^(NY-\d{2}-[A-Z]{3}-\d{4}|CA-\d{2}-(SAN|LAX)-\d{4})$'
 
     # Do not edit following code
     prog = re.compile(pattern)
@@ -240,7 +240,9 @@ def match_10(string):
     ['bde']
     
     '''
-    ...
+    string = string.lower()
+    string = re.sub(r'[^0-9b-z]', '', string)
+    return [string[i:i+3] for i in range(0, len(string), 3) if i+3 <= len(string)]
 
 
 # ---------------------------------------------------------------------
@@ -249,7 +251,17 @@ def match_10(string):
 
 
 def extract_personal(s):
-    ...
+    email_reg = r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'
+    ssn_reg = r'\b\d{3}-\d{2}-\d{4}\b'
+    bitcoin_reg = r'\b1[a-km-zA-HJ-NP-Z0-9]{26,35}\b'
+    street_reg = r'\d{2,5}\s\w+(?:\s\w+)*\s(?:Street|St|Avenue|Ave|Boulevard|Blvd|Court|Ct|Drive|Dr|Lane|Ln|Parkway|Pkwy|Road|Rd|Trail|Trl|Way|Plaza|Plz|Terrace|Ter|Place|Pl|Circle|Cir|Square|Sq|Loop|Lp)'
+
+    email = re.findall(email_reg, s)
+    ssn = re.findall(ssn_reg, s)
+    bitcoin = re.findall(bitcoin_reg, s)
+    street = re.findall(street_reg, s)
+
+    return (email, ssn, bitcoin, street)
 
 
 # ---------------------------------------------------------------------
