@@ -100,9 +100,9 @@ def comparing_performance():
     # create a model per variable => (variable, R^2, RMSE) table
     return [0.8493305264354858,
  1548.533193061309,
- 'color',
- 'color',
- 'carat',
+ 'x',
+ 'carat * x',
+ 'ordinal_color',
  1489.5752545849107]
 
 
